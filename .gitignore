@@ -1,0 +1,96 @@
+############################
+# OS / General
+############################
+.DS_Store
+Thumbs.db
+desktop.ini
+
+############################
+# Visual Studio
+############################
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+############################
+# Build results
+############################
+bin/
+obj/
+out/
+
+############################
+# .NET / ASP.NET Core
+############################
+project.lock.json
+project.fragment.lock.json
+artifacts/
+*.log
+
+############################
+# Rider
+############################
+.idea/
+*.sln.iml
+
+############################
+# VS Code
+############################
+.vscode/
+!.vscode/extensions.json
+
+############################
+# NuGet
+############################
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+
+############################
+# Test results
+############################
+TestResults/
+coverage/
+*.coverage
+*.coveragexml
+
+############################
+# Secrets & local config
+############################
+appsettings.Development.json
+appsettings.Local.json
+secrets.json
+*.env
+
+############################
+# Docker
+############################
+docker-compose.override.yml
+
+############################
+# Frontend (Node / React / Vite / Next)
+############################
+frontend/node_modules/
+frontend/dist/
+frontend/.next/
+frontend/.output/
+frontend/build/
+frontend/.env.local
+frontend/.env.development
+frontend/.env.production
+
+############################
+# Logs
+############################
+logs/
+*.log
+
+############################
+# Misc
+############################
+*.tmp
+*.bak
+*.swp
