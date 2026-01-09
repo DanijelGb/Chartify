@@ -1,0 +1,36 @@
+using Serilog;
+
+var builder = WebApplication.CreateBuilder(args);
+
+
+builder.Host.UseSerilog((context, services, configuration) =>
+{
+    configuration
+    .ReadFrom.Configuration(context.Configuration)
+    .ReadFrom.Services(services)
+    .Enrich.FromLogContext()
+    .Enrich.WithEnvironmentName()
+    .Enrich.WithThreadId();
+});
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddOpenApi();
+builder.Services.AddControllers();
+
+var app = builder.Build();
+
+app.UseSerilogRequestLogging();
+app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
+}
+
+app.UseHttpsRedirection();
+
+
+app.MapControllers();
+app.Run();
+

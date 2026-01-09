@@ -1,0 +1,6 @@
+@Chartify.Api_HostAddress = http://localhost:5111
+
+GET {{Chartify.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
