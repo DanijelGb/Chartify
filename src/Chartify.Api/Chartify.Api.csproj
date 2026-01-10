@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Chartify.Application\Chartify.Application.csproj" />
+    <ProjectReference Include="..\Chartify.Infrastructure\Chartify.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

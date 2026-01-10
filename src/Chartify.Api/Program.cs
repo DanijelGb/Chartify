@@ -1,4 +1,6 @@
 using Serilog;
+using Chartify.Application.Interfaces;
+using Chartify.Infrastructure.Spotify;
 
 var builder = WebApplication.CreateBuilder(args);
 
