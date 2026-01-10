@@ -16,6 +16,8 @@ builder.Host.UseSerilog((context, services, configuration) =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
+builder.Services.AddSingleton<ISpotifyClient, SpotifyClient>();
+
 
 var app = builder.Build();
 

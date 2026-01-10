@@ -13,10 +13,11 @@ namespace Chartify.Api.ChartController
             _logger = logger;
         }
 
-        [HttpGet]
+        [HttpGet("global/top-100")]
         public async Task<ActionResult<string>> GetCharts()
         {
             _logger.LogInformation("Fetching global top 100 chart");
+            var result = await _chartService.GetGlobalTop100Async();
 
             return Ok("Top 100");
         }
