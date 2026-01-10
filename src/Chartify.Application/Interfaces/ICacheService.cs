@@ -1,3 +1,6 @@
+
+namespace Chartify.Application.Interfaces;
+
 public interface IChacheService
 {
     Task<T?> GetAsync<T>(string key);
