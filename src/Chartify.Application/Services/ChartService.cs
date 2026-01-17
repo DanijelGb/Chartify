@@ -5,29 +5,50 @@ namespace Chartify.Application{
 
     public class ChartService : IChartService
     {
-        private readonly ISpotifyClient _spotifyClient;
-
-        public ChartService(ISpotifyClient spotifyClient)
+        private readonly IChartSource _chartSource;
+        private readonly ICacheService _cache;
+        public ChartService(IChartSource chartSource, ICacheService cache)
         {
-            _spotifyClient = spotifyClient;
+            _cache = cache;
+            _chartSource = chartSource;
         }
 
         public async Task<Chart> GetGlobalTop100Async()
         {
-            var tracks = await _spotifyClient.GetTopTracksAsync("GLOBAL");
+            return await GetChartAsync("GLOBAL");
+        }
+        public async Task<Chart> GetChartAsync(string country)
+        {
+            var cacheKey = $"charts:{country}:top100";
 
-            return new Chart
+            var cached = await _cache.GetAsync<Chart>(cacheKey);
+            if (cached is not null)
+                return cached;
+
+            var tracks = await _chartSource.GetTopTracksAsync(country);
+
+            var chart = new Chart
             {
-                Country = "GLOBAL",
-                date = DateTime.UtcNow,
+                Country = country,
+                Date = DateTime.UtcNow,
                 Tracks = tracks
             };
+
+            await _cache.SetAsync(cacheKey, chart, TimeSpan.FromHours(24));
+            return chart;
         }
 
 
-        public async Task<Chart> GetTop100ByCountryAsync(string Country)
+        public async Task<Chart> GetTop100ByCountryAsync(string country)
         {
-            return null;
+            var tracks = await _chartSource.GetTopTracksAsync(country);
+
+            return new Chart
+            {
+                Country = country,
+                Date = DateTime.UtcNow,
+                Tracks = tracks
+            };
         }
     }
 

@@ -24,13 +24,43 @@ public class SpotifyClient : ISpotifyClient
         _options = options.Value;
         _logger = logger;
     }
+
     public async Task<IReadOnlyList<Track>> GetTopTracksAsync(string country)
     {
         _logger.LogInformation("Using spotify token to fetch tracks for {Country}", country);
 
         return Array.Empty<Track>();
-
     }
+    public async Task<IReadOnlyList<Track>> GetTopTracksFromPlaylistAsync(string playlistId)
+    {
+
+        await EnsureTokenAsync();
+        var url = $"https://api.spotify.com/v1/playlists/{playlistId}/tracks?limit=50";
+        var response = await _httpClient.GetAsync(url);
+        response.EnsureSuccessStatusCode();
+
+        using var stream = await response.Content.ReadAsStreamAsync();
+        var data = await JsonSerializer.DeserializeAsync<PlaylistTracksResponse>(stream);
+
+        var tracks = new List<Track>();
+        int rank = 1;
+
+        foreach (var item in data!.Items)
+        {
+            if (item.Track == null) continue;
+
+            tracks.Add(new Track
+            {
+                Id = item.Track.Id!,
+                Name = item.Track.Name!,
+                Artist = item.Track.Artists.First().Name!,
+                Rank = rank++
+            });
+        }
+
+        return Array.Empty<Track>();
+    }
+
     public async Task EnsureTokenAsync()
     {
         if (_accessToken != null && DateTime.UtcNow < _tokenExpiresAt)
@@ -68,5 +98,27 @@ public class SpotifyClient : ISpotifyClient
     {
         public string AccessToken { get; set; } = default;
         public int ExpiresIn { get; set; }
+    }
+
+    private sealed class PlaylistTracksResponse
+    {
+        public List<Item> Items { get; set; } = [];
+    }
+
+    private sealed class Item
+    {
+        public SpotifyTrack? Track { get; set; }
+    }
+
+    private sealed class SpotifyTrack
+    {
+        public string? Id { get; set; }
+        public string? Name { get; set; }
+        public List<Artist> Artists { get; set; } = [];
+    }
+
+    private sealed class Artist
+    {
+        public string? Name { get; set; }
     }
 }

@@ -1,6 +1,10 @@
 using Serilog;
 using Chartify.Application.Interfaces;
 using Chartify.Infrastructure.Spotify;
+using Chartify.Application;
+using Chartify.Infrastructure.Cache;
+using StackExchange.Redis;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +26,15 @@ builder.Services.Configure<SpotifyOptions>(
     builder.Configuration.GetSection("Spotify"));
 
 builder.Services.AddHttpClient<ISpotifyClient, SpotifyClient>();
+builder.Services.Configure<SpotifyChartOptions>(
+    builder.Configuration.GetSection("Spotify"));
+
+builder.Services.AddSingleton<IConnectionMultiplexer>(
+    ConnectionMultiplexer.Connect("localhost:6379"));
+
+builder.Services.AddSingleton<ICacheService, RedisCacheService>();
+builder.Services.AddScoped<IChartService, ChartService>();
+builder.Services.AddScoped<IChartSource, SpotifyChartSource>();
 
 
 var app = builder.Build();

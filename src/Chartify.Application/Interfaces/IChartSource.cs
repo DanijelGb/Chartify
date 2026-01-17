@@ -2,8 +2,7 @@ using Chartify.Domain.Entities;
 
 namespace Chartify.Application.Interfaces;
 
-public interface ISpotifyClient
+public interface IChartSource
 {
     Task<IReadOnlyList<Track>> GetTopTracksAsync(string country);
-    Task<IReadOnlyList<Track>> GetTopTracksFromPlaylistAsync(string playlistId);
 }
