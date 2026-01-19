@@ -5,6 +5,8 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using Microsoft.Extensions.Options;
+using System.Text.Json.Serialization;
+using System.Runtime;
 
 namespace Chartify.Infrastructure.Spotify;
 
@@ -36,8 +38,26 @@ public class SpotifyClient : ISpotifyClient
 
         await EnsureTokenAsync();
         var url = $"https://api.spotify.com/v1/playlists/{playlistId}/tracks?limit=50";
-        var response = await _httpClient.GetAsync(url);
-        response.EnsureSuccessStatusCode();
+
+
+        using var request = new HttpRequestMessage(HttpMethod.Get, url);
+        request.Headers.Authorization =
+            new AuthenticationHeaderValue("Bearer", _accessToken);
+
+
+        _logger.LogInformation(
+            "Bearer header = {Auth}",
+            request.Headers.Authorization?.ToString()
+        );
+
+        var response = await _httpClient.SendAsync(request);
+
+
+        var body = await response.Content.ReadAsStringAsync();
+        if (!response.IsSuccessStatusCode)
+            throw new Exception($"Spotify error {response.StatusCode}: {body}");
+
+        //response.EnsureSuccessStatusCode();
 
         using var stream = await response.Content.ReadAsStreamAsync();
         var data = await JsonSerializer.DeserializeAsync<PlaylistTracksResponse>(stream);
@@ -58,7 +78,7 @@ public class SpotifyClient : ISpotifyClient
             });
         }
 
-        return Array.Empty<Track>();
+        return tracks;
     }
 
     public async Task EnsureTokenAsync()
@@ -72,7 +92,7 @@ public class SpotifyClient : ISpotifyClient
             Encoding.UTF8.GetBytes($"{_options.ClientId}:{_options.ClientSecret}")
         );
 
-        using var request = new HttpRequestMessage(HttpMethod.Post, "http://accounts.spotify.com/api/token");
+        using var request = new HttpRequestMessage(HttpMethod.Post, "https://accounts.spotify.com/api/token");
         request.Headers.Authorization = new AuthenticationHeaderValue("Basic", authHeader);
         request.Content = new FormUrlEncodedContent(new Dictionary<string, string>
         {
@@ -96,29 +116,40 @@ public class SpotifyClient : ISpotifyClient
 
     private sealed class TokenResponse
     {
-        public string AccessToken { get; set; } = default;
+        [JsonPropertyName("access_token")]
+        public string AccessToken { get; set; } = null;
+
+        [JsonPropertyName("expires_in")]
         public int ExpiresIn { get; set; }
     }
 
     private sealed class PlaylistTracksResponse
     {
+        [JsonPropertyName("items")]
         public List<Item> Items { get; set; } = [];
     }
 
     private sealed class Item
     {
+        [JsonPropertyName("track")]
         public SpotifyTrack? Track { get; set; }
     }
 
     private sealed class SpotifyTrack
     {
+        [JsonPropertyName("id")]
         public string? Id { get; set; }
+
+        [JsonPropertyName("name")]
         public string? Name { get; set; }
+
+        [JsonPropertyName("artists")]
         public List<Artist> Artists { get; set; } = [];
     }
 
     private sealed class Artist
     {
+        [JsonPropertyName("name")]
         public string? Name { get; set; }
     }
 }

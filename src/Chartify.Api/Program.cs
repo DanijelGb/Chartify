@@ -27,10 +27,21 @@ builder.Services.Configure<SpotifyOptions>(
 
 builder.Services.AddHttpClient<ISpotifyClient, SpotifyClient>();
 builder.Services.Configure<SpotifyChartOptions>(
-    builder.Configuration.GetSection("Spotify"));
+    builder.Configuration.GetSection("SpotifyCharts"));
 
-builder.Services.AddSingleton<IConnectionMultiplexer>(
-    ConnectionMultiplexer.Connect("localhost:6379"));
+builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+{
+    var options = new ConfigurationOptions
+    {
+        EndPoints = { "127.0.0.1:6379" },
+        AbortOnConnectFail = false,
+        ConnectTimeout = 5000,
+        ConnectRetry = 3
+    };
+
+    return ConnectionMultiplexer.Connect(options);
+});
+
 
 builder.Services.AddSingleton<ICacheService, RedisCacheService>();
 builder.Services.AddScoped<IChartService, ChartService>();
@@ -40,7 +51,6 @@ builder.Services.AddScoped<IChartSource, SpotifyChartSource>();
 var app = builder.Build();
 
 app.UseSerilogRequestLogging();
-app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -48,9 +58,9 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
+Log.Information("Hello");
 
+app.UseHttpsRedirection();
 
 app.MapControllers();
 app.Run();
-

@@ -15,7 +15,7 @@ namespace Chartify.Application{
 
         public async Task<Chart> GetGlobalTop100Async()
         {
-            return await GetChartAsync("GLOBAL");
+            return await GetChartAsync("SE");
         }
         public async Task<Chart> GetChartAsync(string country)
         {
