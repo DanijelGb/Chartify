@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chartify.Infrastructure", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chartify.Api", "src\Chartify.Api\Chartify.Api.csproj", "{81CCA43D-DBE3-4C58-B313-4705A52A68DF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chartify.Ingestion", "src\Chartify.Ingestion\Chartify.Ingestion.csproj", "{44540936-4956-4162-A0AD-0FE0DB015C0E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,6 +73,18 @@ Global
 		{81CCA43D-DBE3-4C58-B313-4705A52A68DF}.Release|x64.Build.0 = Release|Any CPU
 		{81CCA43D-DBE3-4C58-B313-4705A52A68DF}.Release|x86.ActiveCfg = Release|Any CPU
 		{81CCA43D-DBE3-4C58-B313-4705A52A68DF}.Release|x86.Build.0 = Release|Any CPU
+		{44540936-4956-4162-A0AD-0FE0DB015C0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44540936-4956-4162-A0AD-0FE0DB015C0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44540936-4956-4162-A0AD-0FE0DB015C0E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{44540936-4956-4162-A0AD-0FE0DB015C0E}.Debug|x64.Build.0 = Debug|Any CPU
+		{44540936-4956-4162-A0AD-0FE0DB015C0E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{44540936-4956-4162-A0AD-0FE0DB015C0E}.Debug|x86.Build.0 = Debug|Any CPU
+		{44540936-4956-4162-A0AD-0FE0DB015C0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44540936-4956-4162-A0AD-0FE0DB015C0E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{44540936-4956-4162-A0AD-0FE0DB015C0E}.Release|x64.ActiveCfg = Release|Any CPU
+		{44540936-4956-4162-A0AD-0FE0DB015C0E}.Release|x64.Build.0 = Release|Any CPU
+		{44540936-4956-4162-A0AD-0FE0DB015C0E}.Release|x86.ActiveCfg = Release|Any CPU
+		{44540936-4956-4162-A0AD-0FE0DB015C0E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -80,5 +94,6 @@ Global
 		{A65B66C3-5AE9-41C9-A054-60980FFD3AF9} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{E306C94C-CF26-484A-9063-3A0B4261DA1E} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{81CCA43D-DBE3-4C58-B313-4705A52A68DF} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{44540936-4956-4162-A0AD-0FE0DB015C0E} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 	EndGlobalSection
 EndGlobal

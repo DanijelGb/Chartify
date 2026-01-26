@@ -97,3 +97,9 @@ logs/
 *.swp
 
 .fake
+
+spotify-auth.json
+chart.csv
+Chartify.Ingestion/bin/
+Chartify.Ingestion/obj/
+ms-playwright/

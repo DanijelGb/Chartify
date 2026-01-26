@@ -5,51 +5,35 @@ namespace Chartify.Application{
 
     public class ChartService : IChartService
     {
-        private readonly IChartSource _chartSource;
         private readonly ICacheService _cache;
-        public ChartService(IChartSource chartSource, ICacheService cache)
+        private readonly IChartRepository _repo;
+        public ChartService(
+            ICacheService cache,
+            IChartRepository repo)
         {
             _cache = cache;
-            _chartSource = chartSource;
+            _repo = repo;
         }
 
         public async Task<Chart> GetGlobalTop100Async()
         {
-            return await GetChartAsync("SE");
+            return await GetChartAsync("global");
         }
         public async Task<Chart> GetChartAsync(string country)
         {
+
             var cacheKey = $"charts:{country}:top100";
 
             var cached = await _cache.GetAsync<Chart>(cacheKey);
             if (cached is not null)
                 return cached;
 
-            var tracks = await _chartSource.GetTopTracksAsync(country);
 
-            var chart = new Chart
-            {
-                Country = country,
-                Date = DateTime.UtcNow,
-                Tracks = tracks
-            };
+            var chart = await _repo.GetLatestAsync(country) ?? throw new Exception("Couldnt find any chart");
 
             await _cache.SetAsync(cacheKey, chart, TimeSpan.FromHours(24));
+
             return chart;
         }
-
-
-        public async Task<Chart> GetTop100ByCountryAsync(string country)
-        {
-            var tracks = await _chartSource.GetTopTracksAsync(country);
-
-            return new Chart
-            {
-                Country = country,
-                Date = DateTime.UtcNow,
-                Tracks = tracks
-            };
-        }
     }
-
 }
