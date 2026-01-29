@@ -15,12 +15,13 @@ public class ChartRepository : IChartRepository
         _db = db;
     }
 
-    public async Task<Chart?> GetLatestAsync(string location)
+    public async Task<Chart?> GetLatestAsync(string country, DateOnly date)
     {
         var entity = await _db.Charts
-            .Include(c => c.Entries)
+            .Where(c => c.Region == country && c.Date == date)
             .OrderByDescending(c => c.Date)
-            .FirstOrDefaultAsync(c => c.Region == location);
+            .Include(c => c.Entries.OrderBy(e => e.Rank))
+            .FirstOrDefaultAsync();
 
         return entity == null ? null : ChartMapper.ToDomain(entity);
     }

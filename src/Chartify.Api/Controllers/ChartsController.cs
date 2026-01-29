@@ -20,9 +20,19 @@ namespace Chartify.Api.Controllers
         public async Task<ActionResult<Chart>> GetCharts()
         {
             _logger.LogInformation("Fetching global top 100 chart");
-            var chart = await _chartService.GetGlobalTop100Async();
 
-            return Ok(chart);
+            try
+            {
+                var chart = await _chartService.GetGlobalTop100Async();
+                return Ok(chart);
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex, "An error occured while fetching the global top 100 chart");
+                return StatusCode(500, "Internal server error");
+            }
+
         }
 
     }

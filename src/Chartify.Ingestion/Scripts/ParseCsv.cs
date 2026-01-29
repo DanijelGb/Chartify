@@ -4,23 +4,36 @@ using Chartify.Infrastructure.ChartEntries;
 
 namespace Chartify.Ingestion.Scripts;
 
-public static class ParseCsv
+public class ParseCsv
 {
-    public static ChartEntity Parse(Stream csvStream)
+    private readonly ILogger<ParseCsv> _logger;
+    private readonly IConfiguration _config;
+
+    public ParseCsv(ILogger<ParseCsv> logger, IConfiguration config)
     {
-        using var reader = new StreamReader(csvStream);
-        using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+        _logger = logger;
+        _config = config;
+    }
 
-        csv.Context.RegisterClassMap<ChartCsvRowMap>(); // ✅ ADD THIS
-
-        var rows = csv.GetRecords<ChartCsvRow>().ToList();
-
-        var chart = new ChartEntity
+    public ChartEntity Parse(Stream csvStream)
+    {
+        try
         {
-            Id = Guid.NewGuid(),
-            Date = DateOnly.FromDateTime(DateTime.UtcNow),
-            Region = "global",
-            Type = "daily"
+            var maxEntries = _config.GetValue<int>("ChartifySettings:MaxEntriesPerChart");
+            using var reader = new StreamReader(csvStream);
+            using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+
+            csv.Context.RegisterClassMap<ChartCsvRowMap>();
+
+            var rows = csv.GetRecords<ChartCsvRow>().Take(maxEntries).ToList();
+
+            _logger.LogInformation("Parsed {RowCount} rows from CSV (max: {MaxEntries})", rows.Count, maxEntries);
+
+            var chart = new ChartEntity
+            {
+                Date = DateOnly.FromDateTime(DateTime.UtcNow),
+                Region = "global",
+                Type = "daily"
         };
 
         chart.Entries = rows.Select(r => new ChartEntryEntity
@@ -33,6 +46,14 @@ public static class ParseCsv
             Streams = r.Streams
         }).ToList();
 
-        return chart;
+            _logger.LogInformation("Chart entity created with {EntryCount} entries", chart.Entries.Count);
+
+            return chart;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while parsing CSV");
+            throw;
+        }
     }
 }

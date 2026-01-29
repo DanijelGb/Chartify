@@ -3,6 +3,7 @@ using System;
 using Chartify.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Chartify.Infrastructure.Migrations
 {
     [DbContext(typeof(ChartifyDbContext))]
-    partial class ChartifyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260129183647_UpdateChartCompositeKey")]
+    partial class UpdateChartCompositeKey
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

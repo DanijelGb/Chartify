@@ -10,7 +10,6 @@ using Chartify.Infrastructure.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
 builder.Host.UseSerilog((context, services, configuration) =>
 {
     configuration
@@ -46,7 +45,6 @@ var app = builder.Build();
 
 app.UseSerilogRequestLogging();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();

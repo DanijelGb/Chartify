@@ -5,5 +5,5 @@ namespace Chartify.Application.Interfaces;
 
 public interface IChartRepository
 {
-    Task<Chart?> GetLatestAsync(string location);
+    Task<Chart?> GetLatestAsync(string country, DateOnly date);
 }

@@ -2,7 +2,6 @@ namespace Chartify.Infrastructure.ChartEntries;
 
 public class ChartEntity
 {
-    public Guid Id { get; set; }
     public DateOnly Date { get; set; }
     public string Region { get; set; } = null!;
     public string Type { get; set; } = "daily";
@@ -19,6 +18,7 @@ public class ChartEntryEntity
     public string ArtistNames { get; set; } = null!;
     public long Streams { get; set; }
 
-    public Guid ChartId { get; set; }
+    public DateOnly ChartDate { get; set; }
+    public string ChartRegion { get; set; } = null!;
     public ChartEntity Chart { get; set; } = null!;
 }

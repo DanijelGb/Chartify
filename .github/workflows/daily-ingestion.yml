@@ -1,0 +1,31 @@
+name: Daily Spotify Chart Ingestion
+
+on:
+  schedule:
+    - cron: "0 6 * * *"   # 06:00 UTC daily
+  workflow_dispatch:      # manual trigger
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore & build
+        run: dotnet build
+
+      - name: Install Playwright browsers
+        run: |
+          pwsh Chartify.Ingestion/bin/Debug/net8.0/playwright.ps1 install
+
+      - name: Run ingestion
+        env:
+          ConnectionStrings__Default: ${{ secrets.DB_CONNECTION }}
+        run: dotnet run --project Chartify.Ingestion
