@@ -1,0 +1,39 @@
+# Git
+.git
+.gitignore
+
+# Build outputs
+bin/
+obj/
+.vs/
+.vscode/
+
+# IDE files
+*.swp
+*.swo
+*~
+.DS_Store
+.idea/
+*.user
+*.suo
+
+# Test results
+TestResults/
+.coverage/
+
+# NuGet
+*.nupkg
+*.snupkg
+*.symbols.nupkg
+
+# User-specific files
+user-specific/
+local-config/
+
+# Logs (but keep the directory)
+Logs/*
+!Logs/.gitkeep
+
+# Environment files
+.env
+.env.local

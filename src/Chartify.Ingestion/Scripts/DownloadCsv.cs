@@ -52,21 +52,34 @@ public class DownloadCsv
             _logger.LogDebug("Waiting for DOM content to load");
             await page.WaitForLoadStateAsync(LoadState.DOMContentLoaded);
 
+            _logger.LogDebug("Waiting for network to be idle");
+            await page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+
             _logger.LogDebug("Waiting additional 2 seconds for page to fully render");
             await page.WaitForTimeoutAsync(2000);
 
-            _logger.LogDebug("Navigating to download button using Tab key presses");
-            for (int i = 0; i < 9; i++)
-            {
-                await page.Keyboard.PressAsync("Tab");
-            }
-            _logger.LogDebug("Tab navigation completed");
+            _logger.LogDebug("Looking for CSV download button");
+            // Target the specific button with aria-labelledby containing 'csv_download'
+            var downloadButton = await page.QuerySelectorAsync("button[aria-labelledby*='csv_download']");
 
-            _logger.LogInformation("Triggering CSV download");
+            if (downloadButton == null)
+            {
+                _logger.LogWarning("Button with aria-labelledby*='csv_download' not found, trying alternative selector");
+                // Fallback: look for button with data-encore-id
+                downloadButton = await page.QuerySelectorAsync("button[data-encore-id='buttonTertiary']");
+            }
+
+            if (downloadButton == null)
+            {
+                _logger.LogError("Could not find download button with expected selectors");
+                throw new InvalidOperationException("Download button not found on page");
+            }
+
+            _logger.LogInformation("CSV download button found, clicking it");
             var download = await page.RunAndWaitForDownloadAsync(async () =>
-        {
-            await page.Keyboard.PressAsync("Enter");
-        });
+            {
+                await downloadButton.ClickAsync();
+            });
             _logger.LogInformation("CSV file download initiated successfully");
 
             _logger.LogDebug("Reading downloaded file into memory stream");

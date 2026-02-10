@@ -1,0 +1,41 @@
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: chartify-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - chartify-network
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: chartify-api:latest
+    container_name: chartify-api
+    depends_on:
+      redis:
+        condition: service_healthy
+    env_file: .env
+    environment: {}
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    volumes:
+      - ./src/Chartify.Api/Logs:/app/Logs
+    networks:
+      - chartify-network
+
+volumes:
+  redis_data:
+
+networks:
+  chartify-network:
+    driver: bridge
