@@ -29,7 +29,6 @@ builder.ConfigureServices((context, services) =>
     services.AddScoped<ParseCsv>();
     services.AddScoped<ImportCsv>();
 
-    // Add Quartz scheduler
     services.AddQuartz(q =>
     {
         var jobKey = new JobKey("DownloadChartJob");
@@ -39,7 +38,6 @@ builder.ConfigureServices((context, services) =>
                 .WithDescription("Daily chart ingestion from Spotify")
         );
 
-        // Run daily at 1 AM UTC (Quartz uses 6-field format: seconds minutes hours day-of-month month day-of-week)
         q.AddTrigger(opts => opts
             .ForJob(jobKey)
             .WithIdentity("DailyChartTrigger")
