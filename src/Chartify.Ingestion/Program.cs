@@ -1,6 +1,8 @@
 ﻿using Chartify.Ingestion.Scripts;
+using Chartify.Ingestion.Jobs;
 using Chartify.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using Quartz;
 using Serilog;
 
 var builder = Host.CreateDefaultBuilder(args);
@@ -22,20 +24,34 @@ builder.ConfigureServices((context, services) =>
             context.Configuration.GetConnectionString("Postgres")
         )
     );
+
     services.AddScoped<DownloadCsv>();
     services.AddScoped<ParseCsv>();
     services.AddScoped<ImportCsv>();
+
+    // Add Quartz scheduler
+    services.AddQuartz(q =>
+    {
+        var jobKey = new JobKey("DownloadChartJob");
+
+        q.AddJob<DownloadChartJob>(opts =>
+            opts.WithIdentity(jobKey)
+                .WithDescription("Daily chart ingestion from Spotify")
+        );
+
+        // Run daily at 1 AM UTC (Quartz uses 6-field format: seconds minutes hours day-of-month month day-of-week)
+        q.AddTrigger(opts => opts
+            .ForJob(jobKey)
+            .WithIdentity("DailyChartTrigger")
+            .WithDescription("Daily trigger for chart ingestion")
+            .WithCronSchedule("0 0 1 * * ?") // 1 AM every day
+            .StartNow()
+        );
+    });
+
+    services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
 });
 
 var host = builder.Build();
+await host.RunAsync();
 
-using (var scope = host.Services.CreateScope())
-{
-    var downloadCsv = scope.ServiceProvider.GetRequiredService<DownloadCsv>();
-    var parseCsv = scope.ServiceProvider.GetRequiredService<ParseCsv>();
-    var importCsv = scope.ServiceProvider.GetRequiredService<ImportCsv>();
-
-    await using var csvStream = await downloadCsv.RunAsync();
-    var chart = parseCsv.Parse(csvStream);
-    await importCsv.RunAsync(chart);
-}

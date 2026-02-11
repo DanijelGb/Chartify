@@ -1,5 +1,4 @@
 using Chartify.Application.Interfaces;
-using Chartify.Application.Services;
 using Chartify.Domain.Entities;
 using Microsoft.Extensions.Logging;
 using Moq;

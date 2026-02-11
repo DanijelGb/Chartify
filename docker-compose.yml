@@ -33,6 +33,20 @@ services:
     networks:
       - chartify-network
 
+  ingestion:
+    build:
+      context: .
+      dockerfile: Dockerfile.Ingestion
+    image: chartify-ingestion:latest
+    container_name: chartify-ingestion
+    env_file: .env
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+    volumes:
+      - ./src/Chartify.Ingestion/Logs:/app/Logs
+    networks:
+      - chartify-network
+
 volumes:
   redis_data:
 

@@ -1,0 +1,41 @@
+# Build stage
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+
+WORKDIR /src
+
+# Copy solution and project files
+COPY ["Chartify.sln", "./"]
+COPY ["src/src.sln", "src/"]
+COPY ["src/Chartify.Ingestion/Chartify.Ingestion.csproj", "src/Chartify.Ingestion/"]
+COPY ["src/Chartify.Application/Chartify.Application.csproj", "src/Chartify.Application/"]
+COPY ["src/Chartify.Domain/Chartify.Domain.csproj", "src/Chartify.Domain/"]
+COPY ["src/Chartify.Infrastructure/Chartify.Infrastructure.csproj", "src/Chartify.Infrastructure/"]
+
+# Restore dependencies
+RUN dotnet restore "src/Chartify.Ingestion/Chartify.Ingestion.csproj"
+
+# Copy source code
+COPY ["src/", "src/"]
+
+# Build the application
+WORKDIR "/src/src/Chartify.Ingestion"
+RUN dotnet build "Chartify.Ingestion.csproj" -c Release -o /app/build
+
+# Publish stage
+FROM build AS publish
+RUN dotnet publish "Chartify.Ingestion.csproj" -c Release -o /app/publish /p:UseAppHost=false
+
+# Runtime stage
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
+
+WORKDIR /app
+
+# Copy published application
+COPY --from=publish /app/publish .
+
+# Create logs directory
+RUN mkdir -p /app/Logs
+
+ENV ASPNETCORE_ENVIRONMENT=Production
+
+ENTRYPOINT ["dotnet", "Chartify.Ingestion.dll"]
